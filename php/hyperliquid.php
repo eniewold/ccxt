@@ -976,8 +976,7 @@ class hyperliquid extends Exchange {
             );
             $result[] = $data;
         }
-        $funding_rates = $this->parse_funding_rates($result);
-        return $this->filter_by_array($funding_rates, 'symbol', $symbols);
+        return $this->parse_funding_rates($result, $symbols);
     }
 
     public function parse_funding_rate($info, ?array $market = null): array {
@@ -1935,6 +1934,9 @@ class hyperliquid extends Exchange {
          * @return {array[]} a list of ~@link https://docs.ccxt.com/#/?id=funding-rate-history-structure funding rate structures~
          */
         $this->load_markets();
+        if ($symbol === null) {
+            throw new ArgumentsRequired($this->id . ' fetchFundingRateHistory() requires a $symbol argument');
+        }
         $market = $this->market($symbol);
         $request = array(
             'type' => 'fundingHistory',
@@ -3295,8 +3297,7 @@ class hyperliquid extends Exchange {
         $this->load_markets();
         $symbols = $this->market_symbols($symbols);
         $swapMarkets = $this->fetch_swap_markets();
-        $result = $this->parse_open_interests($swapMarkets);
-        return $this->filter_by_array($result, 'symbol', $symbols);
+        return $this->parse_open_interests($swapMarkets, $symbols);
     }
 
     public function fetch_open_interest(string $symbol, $params = array ()) {

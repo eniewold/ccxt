@@ -985,8 +985,7 @@ export default class hyperliquid extends Exchange {
             );
             result.push (data);
         }
-        const funding_rates = this.parseFundingRates (result);
-        return this.filterByArray (funding_rates, 'symbol', symbols);
+        return this.parseFundingRates (result, symbols);
     }
 
     parseFundingRate (info, market: Market = undefined): FundingRate {
@@ -1948,6 +1947,9 @@ export default class hyperliquid extends Exchange {
      */
     async fetchFundingRateHistory (symbol: Str = undefined, since: Int = undefined, limit: Int = undefined, params = {}) {
         await this.loadMarkets ();
+        if (symbol === undefined) {
+            throw new ArgumentsRequired (this.id + ' fetchFundingRateHistory() requires a symbol argument');
+        }
         const market = this.market (symbol);
         const request: Dict = {
             'type': 'fundingHistory',
@@ -3330,8 +3332,7 @@ export default class hyperliquid extends Exchange {
         await this.loadMarkets ();
         symbols = this.marketSymbols (symbols);
         const swapMarkets = await this.fetchSwapMarkets ();
-        const result = this.parseOpenInterests (swapMarkets);
-        return this.filterByArray (result, 'symbol', symbols) as OpenInterests;
+        return this.parseOpenInterests (swapMarkets, symbols) as OpenInterests;
     }
 
     /**

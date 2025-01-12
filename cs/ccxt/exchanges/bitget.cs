@@ -4512,8 +4512,10 @@ public partial class bitget : Exchange
         {
             throw new NotSupported ((string)add(this.id, " createMarketBuyOrderWithCost() supports spot orders only")) ;
         }
-        ((IDictionary<string,object>)parameters)["createMarketBuyOrderRequiresPrice"] = false;
-        return await this.createOrder(symbol, "market", "buy", cost, null, parameters);
+        object req = new Dictionary<string, object>() {
+            { "createMarketBuyOrderRequiresPrice", false },
+        };
+        return await this.createOrder(symbol, "market", "buy", cost, null, this.extend(req, parameters));
     }
 
     /**
@@ -7578,8 +7580,7 @@ public partial class bitget : Exchange
         // }
         symbols = this.marketSymbols(symbols);
         object data = this.safeList(response, "data", new List<object>() {});
-        object result = this.parseFundingRates(data, market);
-        return this.filterByArray(result, "symbol", symbols);
+        return this.parseFundingRates(data, symbols);
     }
 
     public override object parseFundingRate(object contract, object market = null)

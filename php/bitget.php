@@ -4306,8 +4306,10 @@ class bitget extends Exchange {
         if (!$market['spot']) {
             throw new NotSupported($this->id . ' createMarketBuyOrderWithCost() supports spot orders only');
         }
-        $params['createMarketBuyOrderRequiresPrice'] = false;
-        return $this->create_order($symbol, 'market', 'buy', $cost, null, $params);
+        $req = array(
+            'createMarketBuyOrderRequiresPrice' => false,
+        );
+        return $this->create_order($symbol, 'market', 'buy', $cost, null, $this->extend($req, $params));
     }
 
     public function create_order(string $symbol, string $type, string $side, float $amount, ?float $price = null, $params = array ()) {
@@ -6998,8 +7000,7 @@ class bitget extends Exchange {
         // }
         $symbols = $this->market_symbols($symbols);
         $data = $this->safe_list($response, 'data', array());
-        $result = $this->parse_funding_rates($data, $market);
-        return $this->filter_by_array($result, 'symbol', $symbols);
+        return $this->parse_funding_rates($data, $symbols);
     }
 
     public function parse_funding_rate($contract, ?array $market = null): array {
